@@ -10,6 +10,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Card,
 } from "@material-ui/core";
 import {
   getDatabase,
@@ -110,60 +111,70 @@ function App() {
       <Paper elevation={3}>
         <div className="toDoCard">
           <AppBar position="fixed">
-            <Typography variant="h6">To-do List</Typography>
+            <div className="container">
+              <Typography variant="h4">Public To-do List</Typography>
+            </div>
           </AppBar>
-          <Typography color="textSecondary">In progress</Typography>
-          <FormGroup>
-            {uncheckedToDos.map((item) => (
-              <>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      defaultChecked
-                      checked={item.checked}
-                      onChange={handleChange(item)}
-                    />
-                  }
-                  label={item.toDoItem}
-                />
-              </>
-            ))}
-          </FormGroup>
-          {/* {JSON.stringify(uncheckedToDos)} */}
-          <Divider variant="middle" />
-          <Typography color="textSecondary">Completed</Typography>
-          <FormGroup>
-            {checkedToDos.map((item) => (
-              <>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      defaultChecked
-                      checked={item.checked}
-                      onChange={handleChange(item)}
-                    />
-                  }
-                  label={item.toDoItem}
-                />
-              </>
-            ))}
-          </FormGroup>
-          <Divider variant="middle" />
-          <Typography color="textSecondary">New Item</Typography>
-          <TextField
-            name="toDoItem"
-            onChange={onTextChange}
-            value={tempToDoItem}
-            id="filled-basic"
-            label="New item"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit(toDoItem);
-              }
-            }}
-          />
+          <div className="container">
+            <Typography color="textSecondary">In progress</Typography>
+            <FormGroup>
+              {uncheckedToDos.map((item) => (
+                <>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        defaultChecked
+                        checked={item.checked}
+                        onChange={handleChange(item)}
+                      />
+                    }
+                    label={item.toDoItem}
+                  />
+                </>
+              ))}
+            </FormGroup>
+            {/* {JSON.stringify(uncheckedToDos)} */}
+            <Divider variant="middle" />
+            <Typography color="textSecondary">Completed</Typography>
+            <FormGroup>
+              {checkedToDos.map((item) => (
+                <>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        defaultChecked
+                        checked={item.checked}
+                        onChange={handleChange(item)}
+                      />
+                    }
+                    label={item.toDoItem}
+                  />
+                </>
+              ))}
+            </FormGroup>
+          </div>
         </div>
       </Paper>
+
+      <Card>
+        <TextField
+          name="toDoItem"
+          onChange={onTextChange}
+          value={tempToDoItem}
+          id="Outlined"
+          label="New item"
+          position="absolute"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(toDoItem);
+            }
+          }}
+        />
+      </Card>
+      <p color="white">
+        A simple to-do list developed by{" "}
+        <a href="https://owusubonsu.com">Owusu Bonsu </a>
+      </p>
     </Container>
   );
 }

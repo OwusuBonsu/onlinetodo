@@ -3,13 +3,36 @@
   width: 100vw;
   height: 100vh;
   display: flex !important;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+.container {
+  margin: 10px;
+}
+
+a:link,
+a:visited {
+  color: black;
+}
+
 .MuiPaper-root {
-  height: 80%;
+  height: 75%;
   width: 50%;
+  min-width: 80%;
+  margin-bottom: 10px;
+}
+
+.MuiTextField-root {
+  height: 50px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.MuiCard-root {
+  width: 50% !important;
+  height: 60px !important;
 }
 
 .MuiAppBar-root {
