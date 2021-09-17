@@ -9,17 +9,29 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
+  FormGroup,
 } from "@material-ui/core";
-import { getDatabase, ref, onValue, set, push } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  push,
+  child,
+  get,
+  update,
+} from "firebase/database";
 import firebase from "./firebase";
 
 function App() {
   //Declare states
+  const [toDoObject, updateToDoObject] = useState({});
   const [toDoArray, addtoToDoArray] = useState([]);
   const [tempToDoItem, addTempToDoItem] = useState("");
   const [toDoItem, addToDoItem] = useState("");
   const [checkedToDos, getCheckedToDos] = useState([]);
   const [uncheckedToDos, getUncheckedToDos] = useState([]);
+  const [currentItemStat, setCurrentItemStat] = useState();
 
   //Get database and ref
   const db = getDatabase();
@@ -27,59 +39,70 @@ function App() {
 
   //Populate array with current to do list and update when list is updated
   useEffect(() => {
-    addtoToDoArray([]);
-    getCheckedToDos([]);
-    getUncheckedToDos([]);
     onValue(toDoRef, (snapshot) => {
+      clearArrays();
       const data = snapshot.val();
-      const dataArray = Object.values(data);
-      addtoToDoArray(dataArray);
+      console.log(data);
+      updateToDoObject(data);
     });
   }, []);
 
+  useEffect(() => {
+    console.log(toDoObject);
+    console.log(uncheckedToDos);
+  }, [toDoObject]);
+
+  //Clear out data for rerender
   const clearArrays = () => {
     addtoToDoArray([]);
     getCheckedToDos([]);
     getUncheckedToDos([]);
   };
-  //Log array on change
-  useEffect(() => {
-    console.log(toDoArray);
-  }, [toDoArray]);
 
+  //Check for (un)checked items
   useEffect(() => {
-    toDoArray.forEach((toDos) => {
+    Object.values(toDoObject).forEach((toDos) => {
       if (toDos.checked === true) {
-        console.log(toDos);
+        console.log(toDos.constructor.name);
         getCheckedToDos((checkedToDos) => checkedToDos.concat(toDos));
-      }
-    });
-  }, [toDoArray]);
-
-  useEffect(() => {
-    toDoArray.forEach((toDos) => {
-      if (toDos.checked === false) {
+      } else if (toDos.checked === false) {
+        console.log(toDos);
         getUncheckedToDos((uncheckedToDos) => uncheckedToDos.concat(toDos));
       }
     });
-  }, [toDoArray]);
+  }, [toDoObject]);
+
+  useEffect(() => {
+    console.log(uncheckedToDos);
+    uncheckedToDos.forEach((item) => {
+      console.log(item);
+    });
+  }, [uncheckedToDos]);
 
   const onTextChange = (e) => addTempToDoItem(e.target.value);
 
+  //Push new todo when user presses enter
   const handleSubmit = () => {
-    getCheckedToDos([]);
-    getUncheckedToDos([]);
     if (tempToDoItem !== "") {
-      console.log(tempToDoItem);
-      push(ref(db, "toDos/"), {
+      const key = push(child(ref(db), "posts")).key;
+
+      set(ref(db, "toDos/" + key), {
         toDoItem: tempToDoItem,
         checked: false,
+        key: key,
       });
     }
     if (tempToDoItem === "") {
       console.log("Nothing");
     }
     addTempToDoItem("");
+  };
+
+  const handleChange = (param) => () => {
+    console.log(param);
+    update(ref(db, "toDos/" + param.key), {
+      checked: !param.checked,
+    });
   };
 
   return (
@@ -90,10 +113,41 @@ function App() {
             <Typography variant="h6">To-do List</Typography>
           </AppBar>
           <Typography color="textSecondary">In progress</Typography>
-          {JSON.stringify(uncheckedToDos)}
+          <FormGroup>
+            {uncheckedToDos.map((item) => (
+              <>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      defaultChecked
+                      checked={item.checked}
+                      onChange={handleChange(item)}
+                    />
+                  }
+                  label={item.toDoItem}
+                />
+              </>
+            ))}
+          </FormGroup>
+          {/* {JSON.stringify(uncheckedToDos)} */}
           <Divider variant="middle" />
           <Typography color="textSecondary">Completed</Typography>
-          {JSON.stringify(checkedToDos)}
+          <FormGroup>
+            {checkedToDos.map((item) => (
+              <>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      defaultChecked
+                      checked={item.checked}
+                      onChange={handleChange(item)}
+                    />
+                  }
+                  label={item.toDoItem}
+                />
+              </>
+            ))}
+          </FormGroup>
           <Divider variant="middle" />
           <Typography color="textSecondary">New Item</Typography>
           <TextField
