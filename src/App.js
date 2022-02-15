@@ -12,6 +12,8 @@ import {
   FormGroup,
   Card,
 } from "@material-ui/core";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   getDatabase,
   ref,
@@ -21,6 +23,7 @@ import {
   child,
   get,
   update,
+  remove,
 } from "firebase/database";
 import firebase from "./firebase";
 
@@ -62,15 +65,19 @@ function App() {
 
   //Check for (un)checked items
   useEffect(() => {
-    Object.values(toDoObject).forEach((toDos) => {
-      if (toDos.checked === true) {
-        console.log(toDos.constructor.name);
-        getCheckedToDos((checkedToDos) => checkedToDos.concat(toDos));
-      } else if (toDos.checked === false) {
-        console.log(toDos);
-        getUncheckedToDos((uncheckedToDos) => uncheckedToDos.concat(toDos));
-      }
-    });
+    if (toDoObject === null) {
+      return null;
+    } else {
+      Object.values(toDoObject).forEach((toDos) => {
+        if (toDos.checked === true) {
+          console.log(toDos.constructor.name);
+          getCheckedToDos((checkedToDos) => checkedToDos.concat(toDos));
+        } else if (toDos.checked === false) {
+          console.log(toDos);
+          getUncheckedToDos((uncheckedToDos) => uncheckedToDos.concat(toDos));
+        }
+      });
+    }
   }, [toDoObject]);
 
   useEffect(() => {
@@ -106,6 +113,10 @@ function App() {
     });
   };
 
+  const handleDelete = (param) => {
+    remove(ref(db, "toDos/" + param.key));
+  };
+
   return (
     <Container>
       <Paper elevation={3}>
@@ -119,7 +130,10 @@ function App() {
             <Typography color="textSecondary">In progress</Typography>
             <FormGroup>
               {uncheckedToDos.map((item) => (
-                <>
+                <div>
+                  <IconButton onClick={() => handleDelete(item)}>
+                    <DeleteIcon />
+                  </IconButton>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -130,7 +144,7 @@ function App() {
                     }
                     label={item.toDoItem}
                   />
-                </>
+                </div>
               ))}
             </FormGroup>
             {/* {JSON.stringify(uncheckedToDos)} */}
@@ -138,7 +152,10 @@ function App() {
             <Typography color="textSecondary">Completed</Typography>
             <FormGroup>
               {checkedToDos.map((item) => (
-                <>
+                <div>
+                  <IconButton onClick={() => handleDelete(item)}>
+                    <DeleteIcon />
+                  </IconButton>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -149,7 +166,7 @@ function App() {
                     }
                     label={item.toDoItem}
                   />
-                </>
+                </div>
               ))}
             </FormGroup>
           </div>
